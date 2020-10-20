@@ -11,14 +11,14 @@ import (
 )
 
 func GetProducts(w http.ResponseWriter, r *http.Request) {
+	offset, _ := strconv.Atoi(r.FormValue("offset"))
 	limit, _ := strconv.Atoi(r.FormValue("limit"))
-	start, _ := strconv.Atoi(r.FormValue("start"))
 
 	if limit < 1 {
 		limit = 10
 	}
 
-	orders, err := storage.DBStore.GetProducts(limit, start)
+	orders, err := storage.DBStore.GetProducts(limit, offset)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -31,7 +31,7 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	product := model.Product{}
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&product); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
+		respondWithError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 	defer r.Body.Close()
@@ -45,13 +45,9 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 
 func GetProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Product ID")
-		return
-	}
+	name := vars["name"]
 
-	product, fetchErr := storage.DBStore.GetProduct(id);
+	product, fetchErr := storage.DBStore.GetProduct(name);
 	if fetchErr != nil {
 		respondWithError(w, http.StatusInternalServerError, fetchErr.Error())
 		return
@@ -62,11 +58,8 @@ func GetProduct(w http.ResponseWriter, r *http.Request) {
 
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Product ID")
-		return
-	}
+	name := vars["name"]
+
 	product := model.Product{}
 	decoder := json.NewDecoder(r.Body)
 	if updateErr := decoder.Decode(&product); updateErr != nil {
@@ -74,7 +67,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer r.Body.Close()
-	product.ID = id
+	product.Name = name
 
 	if err := storage.DBStore.UpdateProduct(&product); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
@@ -86,13 +79,9 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	id, err := strconv.Atoi(vars["id"])
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid Product ID")
-		return
-	}
+	name := vars["name"]
 
-	if err := storage.DBStore.DeleteProduct(id); err != nil {
+	if err := storage.DBStore.DeleteProduct(name); err != nil {
 		respondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

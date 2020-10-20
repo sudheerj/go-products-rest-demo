@@ -2,19 +2,25 @@ package storage
 
 import (
 	"fmt"
-	"gorm.io/driver/mysql"
 	"github.com/sudheerj/go-rest.git/configs"
 	"github.com/sudheerj/go-rest.git/model"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
 )
 
 type store interface {
-	GetProducts(limit, offset int) (*[]model.Product, error)
-	GetProduct(id int) (*model.Product, error)
+	GetProducts(offset, limit int) (*[]model.Product, error)
+	GetProduct(name string) (*model.Product, error)
 	CreateProduct(product *model.Product) error
 	UpdateProduct(product *model.Product) error
-	DeleteProduct(id int) error
+	DeleteProduct(name string) error
+
+	GetReviews(product *model.Product) (*[]model.Review, error)
+	GetReview(id int) (*model.Review, error)
+	CreateReview(newReview *model.Review) error
+	UpdateReview(review *model.Review) error
+	DeleteReview(review *model.Review) error
 }
 
 type storeImpl struct {
@@ -22,7 +28,7 @@ type storeImpl struct {
 }
 
 func InitializeDB(dbConfig *configs.Config) {
-	connectionString := fmt.Sprintf("%s:%s@/%s?charset=%s", dbConfig.DB.Username, dbConfig.DB.Password, dbConfig.DB.Database, dbConfig.DB.Charset)
+	connectionString := fmt.Sprintf("%s:%s@/%s?charset=%s", dbConfig.DB.Username, dbConfig.DB.Password, dbConfig.DB.Name, dbConfig.DB.Charset)
 
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	db = dbMigrate(db)
@@ -35,8 +41,9 @@ func InitializeDB(dbConfig *configs.Config) {
 
 // dbMigrate will create and migrate the tables, and then make necessary relationships
 func dbMigrate(db *gorm.DB) *gorm.DB {
-	db.AutoMigrate(&model.Product{}, &model.Review{})
-	// db.Model(&model.Review{}).AddForeignKey("product_id", "products(id)", "CASCADE", "CASCADE")
+	if migrationError := db.AutoMigrate(&model.Product{}, &model.Review{}); migrationError != nil {
+		log.Fatal(migrationError);
+	}
 	return db
 }
 

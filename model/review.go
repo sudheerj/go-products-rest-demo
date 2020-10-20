@@ -4,8 +4,9 @@ import "gorm.io/gorm"
 
 type Review struct {
 	gorm.Model
-	ProductID int `json:"project_id"`
-	Name string `json:"name"`
+	ProductID uint `json:"product_id"`
+	Title string `json:"title"`
+	UserName string `json:"user_name"`
 	Rating int `json:"rating"`
 	Comments string `json:"comments"`
 }

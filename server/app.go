@@ -16,10 +16,10 @@ func (app *App) InitializeRoutes() {
 	app.Router = mux.NewRouter()
 
 	app.Router.HandleFunc("/products", handler.GetProducts).Methods("GET")
-	app.Router.HandleFunc("/product", handler.CreateProduct).Methods("POST")
-	app.Router.HandleFunc("/product/{id:[0-9]+}", handler.GetProduct).Methods("GET")
-	app.Router.HandleFunc("/product/{id:[0-9]+}", handler.UpdateProduct).Methods("PUT")
-	app.Router.HandleFunc("/product/{id:[0-9]+}", handler.DeleteProduct).Methods("DELETE")
+	app.Router.HandleFunc("/products", handler.CreateProduct).Methods("POST")
+	app.Router.HandleFunc("/products/{name}", handler.GetProduct).Methods("GET")
+	app.Router.HandleFunc("/products/{name}", handler.UpdateProduct).Methods("PUT")
+	app.Router.HandleFunc("/products/{name}", handler.DeleteProduct).Methods("DELETE")
 }
 
 func (app *App) Run(address string) {
