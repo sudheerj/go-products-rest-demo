@@ -20,6 +20,12 @@ func (app *App) InitializeRoutes() {
 	app.Router.HandleFunc("/products/{name}", handler.GetProduct).Methods("GET")
 	app.Router.HandleFunc("/products/{name}", handler.UpdateProduct).Methods("PUT")
 	app.Router.HandleFunc("/products/{name}", handler.DeleteProduct).Methods("DELETE")
+
+	app.Router.HandleFunc("/products/{name}/reviews", handler.GetReviews).Methods("GET")
+	app.Router.HandleFunc("/products/{name}/reviews", handler.CreateReview).Methods("POST")
+	app.Router.HandleFunc("/products/{name}/reviews/{id}", handler.GetReview).Methods("GET")
+	app.Router.HandleFunc("/products/{name}/reviews/{id}", handler.UpdateReview).Methods("PUT")
+	app.Router.HandleFunc("/products/{name}/reviews/{id}", handler.DeleteReview).Methods("DELETE")
 }
 
 func (app *App) Run(address string) {
