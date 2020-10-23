@@ -2,11 +2,11 @@ package storage
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 	"github.com/sudheerj/go-rest.git/configs"
 	"github.com/sudheerj/go-rest.git/model"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 )
 
 type store interface {
@@ -30,6 +30,11 @@ type storeImpl struct {
 func InitializeDB(dbConfig *configs.Config) {
 	connectionString := fmt.Sprintf("%s:%s@/%s?charset=%s", dbConfig.DB.Username, dbConfig.DB.Password, dbConfig.DB.Name, dbConfig.DB.Charset)
 
+	log.WithFields(
+		log.Fields{
+			"connectionString": connectionString,
+		},
+	).Info("Open DB Connection")
 	db, err := gorm.Open(mysql.Open(connectionString), &gorm.Config{})
 	db = dbMigrate(db)
 	initStore(&storeImpl{db: db})
