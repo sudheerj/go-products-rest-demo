@@ -16,7 +16,7 @@ func (storeImpl *storeImpl) GetProducts(offset, limit int) (*[]model.Product, er
 		},
 	).Info("Get products")
 	products := make([]model.Product, 0)
-	if err := storeImpl.db.Find(&products).Error; err != nil {
+	if err := storeImpl.db.Limit(limit).Offset(offset).Find(&products).Error; err != nil {
 		return nil, err
 	}
 	return &products, nil
@@ -51,7 +51,7 @@ func (storeImpl *storeImpl) CreateProduct(product *model.Product) error {
 func (storeImpl *storeImpl) UpdateProduct(product *model.Product) error {
 	log.WithFields(
 		log.Fields{
-			"ID": product.Name,
+			"Name": product.Name,
 		},
 	).Info("Update product")
 

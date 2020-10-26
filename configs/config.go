@@ -1,8 +1,12 @@
 package configs
 
+import "gorm.io/gorm"
+
 type Config struct {
 	DB *DBConfig
 }
+
+var DBConn *gorm.DB
 
 type DBConfig struct {
 	Dialect  string
